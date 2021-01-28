@@ -572,6 +572,7 @@ class Client extends EventEmitter {
       return result
     }
 
+    this.emit('query', query);
     this.queryQueue.push(query)
     this._pulseQueryQueue()
     return result

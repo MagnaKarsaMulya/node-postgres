@@ -11,6 +11,7 @@ class Query extends EventEmitter {
 
     config = utils.normalizeQueryConfig(config, values, callback)
 
+    this.timer = process.hrtime()
     this.text = config.text
     this.values = config.values
     this.rows = config.rows
@@ -127,6 +128,7 @@ class Query extends EventEmitter {
     if (this.callback) {
       return this.callback(err)
     }
+    this.emit('execute', this.text, (typeof this.values != 'undefined' ? this.values : []), process.hrtime(this.timer), err);
     this.emit('error', err)
   }
 
@@ -175,6 +177,7 @@ class Query extends EventEmitter {
     // if we're not reading pages of rows send the sync command
     // to indicate the pipeline is finished
     if (!rows) {
+      this.emit('execute', this.text, (typeof this.values != 'undefined' ? this.values : []), process.hrtime(this.timer), null);
       connection.sync()
     } else {
       // otherwise flush the call out to read more rows
